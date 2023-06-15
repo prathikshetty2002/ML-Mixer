@@ -34,8 +34,7 @@ def senti(text):
     else:
         st.write("🙂 Neutral")
         
-if click:
-    senti(text)
+
 
 st.header("Hate speech classification")
 
@@ -48,19 +47,38 @@ def query(payload):
 	response = requests.post(API_URL, headers=headers, json=payload)
 	return response.json()
 
-sentence = st.text_input('Enter your text')
 
-def senti_class(sentence):
-    print(sentence)
-    output=query({"inputs":str(sentence)})
+
+def senti_class(text):
+    print(text)
+    output=query({"inputs":str(text)})
     result={}
-    if sentence:
+    if text:
         for data in output:
             print(data)
-    return data
-output=senti_class(sentence)
+    st.write(output)
+    return output
 
-st.write(output)
+def viz(o):
+    labels = [item['label'] for item in o[0]]
+    scores = [item['score'] for item in o[0]]
+
+    fig = px.bar(x=labels, y=scores)
+
+    fig.update_layout(
+        title="Emotional Scores",
+        xaxis_title="Emotion",
+        yaxis_title="Score"
+    )
+
+    st.plotly_chart(fig)
+
+if click:
+    senti(text)
+    o=senti_class(text)
+    viz(o)
+
+
 # output = query({
 # 	"inputs": "I hate you. I dont love you",
 # })
